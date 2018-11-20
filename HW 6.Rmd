@@ -1,0 +1,35 @@
+---
+title: "Homework 6"
+author: "Alyssa Vanderbeek"
+date: "27 November 2018"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+### Problem 1
+
+```{r}
+homicide_data = read_csv('./data/problem1/homicide-data.csv') # read in data
+
+homicide_data_tidy = homicide_data %>%
+  mutate(city_state = paste(city, state, sep = ', '),
+         victim_race = fct_relevel(ifelse(victim_race == 'White', 'white', 'non-white'), 'white'),
+         victim_age = ifelse(victim_age == 'Unknown', NA, as.numeric(victim_age)),
+         resolved = as.numeric(disposition == "Closed by arrest")) %>%
+  filter(!(city_state %in% c('Tulsa, AL', 'Dallas, TX', 'Phoenix, AZ', 'Kansas City, MO')))
+
+fit_logistic = homicide_data_tidy %>%
+  glm(resolved ~ victim_age + victim_race + victim_sex, data = ., family = binomial())
+  
+fit_logistic %>% 
+  broom::tidy() %>% 
+  mutate(OR = exp(estimate)) %>%
+  select(term, log_OR = estimate, OR, p.value) %>% 
+  knitr::kable(digits = 3)
+```
+
