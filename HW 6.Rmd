@@ -63,6 +63,7 @@ log_reg_cities %>%
                caption = 'Odds of resolved cases for non-white vs. white victims') # write an actual caption
 ```
 
+
 ```{r, fig.height=7, fig.width=5}
 log_reg_cities %>%
   mutate(city = fct_reorder(city, OR, desc = T)) %>%
@@ -88,6 +89,10 @@ birthweight_tidy = birthweight %>%
          frace = fct_recode(as.character(frace), 'White' = '1', 'Black' = '2', 'Asian' = '3', 'Puerto Rican' = '4', 'Other' = '8'))
 
 str(birthweight)
+
+
+lm(bwt ~ blength + gaweeks, data = birthweight_tidy) # comparison model 1
+lm(bwt ~ (bhead + blength + babysex)^3, data = birthweight_tidy) # comparison model 2 with all interaction terms 
 
 ```
 
