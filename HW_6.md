@@ -284,3 +284,33 @@ str(birthweight)
     ##   ..$ default: list()
     ##   .. ..- attr(*, "class")= chr  "collector_guess" "collector"
     ##   ..- attr(*, "class")= chr "col_spec"
+
+``` r
+lm(bwt ~ blength + gaweeks, data = birthweight_tidy) # comparison model 1
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = bwt ~ blength + gaweeks, data = birthweight_tidy)
+    ## 
+    ## Coefficients:
+    ## (Intercept)      blength      gaweeks  
+    ##    -4347.67       128.56        27.05
+
+``` r
+lm(bwt ~ (bhead + blength + babysex)^3, data = birthweight_tidy) # comparison model 2 with all interaction terms 
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = bwt ~ (bhead + blength + babysex)^3, data = birthweight_tidy)
+    ## 
+    ## Coefficients:
+    ##                 (Intercept)                        bhead  
+    ##                  -7176.8170                     181.7956  
+    ##                     blength                babysexFemale  
+    ##                    102.1269                    6374.8684  
+    ##               bhead:blength          bhead:babysexFemale  
+    ##                     -0.5536                    -198.3932  
+    ##       blength:babysexFemale  bhead:blength:babysexFemale  
+    ##                   -123.7729                       3.8781
