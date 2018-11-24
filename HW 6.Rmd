@@ -9,6 +9,8 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+
+theme_set(theme_bw())
 ```
 
 ### Problem 1
@@ -23,13 +25,69 @@ homicide_data_tidy = homicide_data %>%
          resolved = as.numeric(disposition == "Closed by arrest")) %>%
   filter(!(city_state %in% c('Tulsa, AL', 'Dallas, TX', 'Phoenix, AZ', 'Kansas City, MO')))
 
+str(homicide_data_tidy)
+
+# Logistic regression for all cities
 fit_logistic = homicide_data_tidy %>%
   glm(resolved ~ victim_age + victim_race + victim_sex, data = ., family = binomial())
+
+summary(fit_logistic)
   
+# Table of estimated OR and 95% CI for race, holding all else constant
 fit_logistic %>% 
   broom::tidy() %>% 
-  mutate(OR = exp(estimate)) %>%
-  select(term, log_OR = estimate, OR, p.value) %>% 
+  filter(term == 'victim_racenon-white') %>%
+  summarise(OR = exp(estimate),
+            '95% CI lower bound' = exp(estimate - qnorm(0.975)*std.error),
+            '95% CI upper bound' = exp(estimate + qnorm(0.975)*std.error)) %>%
   knitr::kable(digits = 3)
+
+
+# Logistic regression for each city
+log_reg_cities = homicide_data_tidy %>%
+  select(city_state, resolved, victim_age, victim_race, victim_sex) %>%
+  nest(-city_state) %>%
+  mutate(logreg = map(data, ~ broom::tidy(glm(resolved ~ victim_age + victim_race + victim_sex, data = ., family = binomial())))) %>%
+  select(city_state, logreg) %>%
+  unnest %>%
+  filter(term == 'victim_racenon-white') %>%
+  rowwise %>%
+  summarise(city = city_state,
+            OR = exp(estimate),
+            ci_lower = exp(estimate - qnorm(0.975)*std.error),
+            ci_upper = exp(estimate + qnorm(0.975)*std.error))
+
+log_reg_cities %>%
+  knitr::kable(digits = 3,
+               col.names = c('City', 'OR', '95% CI lower bound', '95% CI upper bound'),
+               caption = 'Odds of resolved cases for non-white vs. white victims') # write an actual caption
+```
+
+```{r, fig.height=7, fig.width=5}
+log_reg_cities %>%
+  mutate(city = fct_reorder(city, OR, desc = T)) %>%
+  ggplot(aes(x = city, y = OR)) +
+  geom_point() +
+  geom_errorbar(aes(x = city, ymin = ci_lower, ymax = ci_upper), width = 0.5) +
+  geom_hline(yintercept = 1, lty = 3) +
+  labs(y = 'Odds of resolved cases (non-white vs. white)',
+       x = 'City') +
+  coord_flip()
+  
+```
+
+
+### Problem 2
+
+```{r}
+birthweight = read_csv('./data/problem2/birthweight.csv')
+
+birthweight_tidy = birthweight %>%
+  mutate(babysex = fct_recode(as.character(babysex), 'Male' = '1', 'Female' = '2'),
+         mrace = fct_recode(as.character(mrace), 'White' = '1', 'Black' = '2', 'Asian' = '3', 'Puerto Rican' = '4'),
+         frace = fct_recode(as.character(frace), 'White' = '1', 'Black' = '2', 'Asian' = '3', 'Puerto Rican' = '4', 'Other' = '8'))
+
+str(birthweight)
+
 ```
 
