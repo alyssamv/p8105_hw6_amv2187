@@ -27,7 +27,7 @@ homicide_data = read_csv('./data/problem1/homicide-data.csv') # read in data
 
 ``` r
 homicide_data_tidy = homicide_data %>%
-  mutate(city_state = paste(city, state, sep = ', '),
+  mutate(city_state = paste(city, toupper(state), sep = ', '),
          victim_race = fct_relevel(ifelse(victim_race == 'White', 'white', 'non-white'), 'white'),
          victim_age = ifelse(victim_age == 'Unknown', NA, as.numeric(victim_age)),
          resolved = as.numeric(disposition == "Closed by arrest")) %>%
@@ -108,6 +108,8 @@ fit_logistic %>%
 |------:|-------------------:|-------------------:|
 |  0.561|                0.53|               0.594|
 
+Across all cities in the dataset, the odds of the murder of a non-white person being resolved is 44% less than if the victim were white (all else constant).
+
 ``` r
 # Logistic regression for each city
 log_reg_cities = homicide_data_tidy %>%
@@ -156,7 +158,7 @@ log_reg_cities %>%
 | Louisville, KY     |  0.392|               0.259|               0.593|
 | Memphis, TN        |  0.782|               0.524|               1.168|
 | Miami, FL          |  0.576|               0.377|               0.880|
-| Milwaukee, wI      |  0.632|               0.403|               0.991|
+| Milwaukee, WI      |  0.632|               0.403|               0.991|
 | Minneapolis, MN    |  0.646|               0.345|               1.209|
 | Nashville, TN      |  0.899|               0.653|               1.236|
 | New Orleans, LA    |  0.466|               0.295|               0.737|
@@ -191,7 +193,9 @@ log_reg_cities %>%
   coord_flip()
 ```
 
-![](HW_6_files/figure-markdown_github/unnamed-chunk-2-1.png)
+![](HW_6_files/figure-markdown_github/unnamed-chunk-3-1.png)
+
+The figure above shows the odds ratios for case resolution of white vs. non-white victims (all else constant). All cities on display expect for two - Tampa, FL and Birmingham, AL - exhibit a lower odds of resolving murder of non-white victims, compared to white victims. The odds of resolution between races is about equal in Durham, NC, but the confidence interval around the estimate is wide.
 
 ### Problem 2
 

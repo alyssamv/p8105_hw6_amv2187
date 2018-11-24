@@ -19,11 +19,11 @@ theme_set(theme_bw())
 homicide_data = read_csv('./data/problem1/homicide-data.csv') # read in data
 
 homicide_data_tidy = homicide_data %>%
-  mutate(city_state = paste(city, state, sep = ', '),
-         victim_race = fct_relevel(ifelse(victim_race == 'White', 'white', 'non-white'), 'white'),
-         victim_age = ifelse(victim_age == 'Unknown', NA, as.numeric(victim_age)),
-         resolved = as.numeric(disposition == "Closed by arrest")) %>%
-  filter(!(city_state %in% c('Tulsa, AL', 'Dallas, TX', 'Phoenix, AZ', 'Kansas City, MO')))
+  mutate(city_state = paste(city, toupper(state), sep = ', '), # create city_state variable
+         victim_race = fct_relevel(ifelse(victim_race == 'White', 'white', 'non-white'), 'white'), # dichotomize race as factor (white vs. non-white)
+         victim_age = ifelse(victim_age == 'Unknown', NA, as.numeric(victim_age)), # make age numeric
+         resolved = as.numeric(disposition == "Closed by arrest")) %>% # create binary variable for whether murder is resolved
+  filter(!(city_state %in% c('Tulsa, AL', 'Dallas, TX', 'Phoenix, AZ', 'Kansas City, MO'))) # filter cities
 
 str(homicide_data_tidy)
 
@@ -35,28 +35,32 @@ summary(fit_logistic)
   
 # Table of estimated OR and 95% CI for race, holding all else constant
 fit_logistic %>% 
-  broom::tidy() %>% 
-  filter(term == 'victim_racenon-white') %>%
+  broom::tidy() %>% # tidy output
+  filter(term == 'victim_racenon-white') %>% # get coefficient for race only
   summarise(OR = exp(estimate),
             '95% CI lower bound' = exp(estimate - qnorm(0.975)*std.error),
-            '95% CI upper bound' = exp(estimate + qnorm(0.975)*std.error)) %>%
+            '95% CI upper bound' = exp(estimate + qnorm(0.975)*std.error)) %>% # calculate 95% CI for OR
   knitr::kable(digits = 3)
+```
 
+Across all cities in the dataset, the odds of the murder of a non-white person being resolved is 44% less than if the victim were white (all else constant). 
 
+```{r}
 # Logistic regression for each city
 log_reg_cities = homicide_data_tidy %>%
-  select(city_state, resolved, victim_age, victim_race, victim_sex) %>%
-  nest(-city_state) %>%
-  mutate(logreg = map(data, ~ broom::tidy(glm(resolved ~ victim_age + victim_race + victim_sex, data = ., family = binomial())))) %>%
-  select(city_state, logreg) %>%
-  unnest %>%
-  filter(term == 'victim_racenon-white') %>%
+  select(city_state, resolved, victim_age, victim_race, victim_sex) %>% # select only variables to use in logistic regression
+  nest(-city_state) %>% # nest all variables to each city
+  mutate(logreg = map(data, ~ broom::tidy(glm(resolved ~ victim_age + victim_race + victim_sex, data = ., family = binomial())))) %>% # map logistic regression with nested data, make output a nested tibble
+  select(city_state, logreg) %>% # select only city and model
+  unnest %>% 
+  filter(term == 'victim_racenon-white') %>% # get coefficients for race only
   rowwise %>%
   summarise(city = city_state,
             OR = exp(estimate),
             ci_lower = exp(estimate - qnorm(0.975)*std.error),
-            ci_upper = exp(estimate + qnorm(0.975)*std.error))
+            ci_upper = exp(estimate + qnorm(0.975)*std.error)) # OR and 95% CI for each city
 
+# print table
 log_reg_cities %>%
   knitr::kable(digits = 3,
                col.names = c('City', 'OR', '95% CI lower bound', '95% CI upper bound'),
@@ -65,18 +69,20 @@ log_reg_cities %>%
 
 
 ```{r, fig.height=7, fig.width=5}
+# plot of OR estimate and CI for each city
 log_reg_cities %>%
-  mutate(city = fct_reorder(city, OR, desc = T)) %>%
-  ggplot(aes(x = city, y = OR)) +
+  mutate(city = fct_reorder(city, OR, desc = T)) %>% # order cities according to OR estimate
+  ggplot(aes(x = city, y = OR)) + 
   geom_point() +
-  geom_errorbar(aes(x = city, ymin = ci_lower, ymax = ci_upper), width = 0.5) +
-  geom_hline(yintercept = 1, lty = 3) +
+  geom_errorbar(aes(x = city, ymin = ci_lower, ymax = ci_upper), width = 0.5) + # error bars for CI bounds
+  geom_hline(yintercept = 1, lty = 3) + # dotted line at OR=1 to represent no difference in odds of resolution across races
   labs(y = 'Odds of resolved cases (non-white vs. white)',
        x = 'City') +
   coord_flip()
   
 ```
 
+The figure above shows the odds ratios for case resolution of white vs. non-white victims (all else constant). All cities on display expect for two - Tampa, FL and Birmingham, AL - exhibit a lower odds of resolving murder of non-white victims, compared to white victims. The odds of resolution between races is about equal in Durham, NC, but the confidence interval around the estimate is wide. 
 
 ### Problem 2
 
