@@ -88,17 +88,15 @@ The figure above shows the odds ratios for case resolution of white vs. non-whit
 ### Problem 2
 
 ```{r}
-birthweight = read_csv('./data/problem2/birthweight.csv')
-
-birthweight_tidy = birthweight %>%
+birthweight_tidy = read_csv('./data/problem2/birthweight.csv') %>%
   mutate(babysex = fct_recode(as.character(babysex), 'Male' = '1', 'Female' = '2'),
          mrace = fct_recode(as.character(mrace), 'White' = '1', 'Black' = '2', 'Asian' = '3', 'Puerto Rican' = '4'),
          frace = fct_recode(as.character(frace), 'White' = '1', 'Black' = '2', 'Asian' = '3', 'Puerto Rican' = '4', 'Other' = '8'))
 
-str(birthweight)
+str(birthweight_tidy)
 ```
 
-To construct a regression model, I first included all variables and then removed individually those that were not significant predictors of birthweight. I ended up with the following model:
+To construct a regression model, I first included all variables (no interactions) and then removed individually those that were not significant predictors of birthweight. The full process can be seen in a previous commit. I ended up with the following model:
 
 ```{r}
 my_model = lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = birthweight_tidy) # linear regression model for birthweight
@@ -111,34 +109,44 @@ birthweight_tidy %>%
   modelr::add_residuals(my_model) %>% # residual of observed bwt - predicted bwt
   ggplot(aes(x = pred, y = resid)) + # plot 
   geom_point() + 
-  geom_hline(yintercept = 0, col = 'red') # add line for residual of 0 to better see distribution of residuals
+  geom_hline(yintercept = 0, col = 'red') + # add line for residual of 0 to better see distribution of residuals
+  labs(x = 'Predicted birthweight',
+       y = 'Residuals')
 
 
 # comparison models
 comp_model_1 = lm(bwt ~ blength + gaweeks, data = birthweight_tidy) # comparison model 1
+summary(comp_model_1)
+
 comp_model_2 = lm(bwt ~ (bhead + blength + babysex)^3, data = birthweight_tidy) # comparison model 2 with all interaction terms 
+summary(comp_model_2)
 ```
 
 ```{r}
 # test/train dataset for cross validation of models
 bwt_cv = birthweight_tidy %>%
-  crossv_mc(., 100) %>%
-  mutate(train = map(train, as_tibble),
+  crossv_mc(., n = 100) %>% # subset original dataset for cross validation
+  mutate(train = map(train, as_tibble), # create train and test subsets
          test = map(test, as_tibble)) %>%
-  mutate(my_model = map(train, ~lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = .x)),
-         comp1 = map(train, ~ lm(bwt ~ blength + gaweeks, data = .x)),
-         comp2 = map(train, ~ lm(bwt ~ (bhead + blength + babysex)^3, data = .x))) %>%
-  mutate(rmse_my_model    = map2_dbl(my_model, test, ~rmse(model = .x, data = .y)),
-         rmse_comp1 = map2_dbl(comp1, test, ~rmse(model = .x, data = .y)),
-         rmse_comp2 = map2_dbl(comp2, test, ~rmse(model = .x, data = .y)))
+  mutate(my_model = map(train, ~lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = .x)), # prediction using my model across each training subset
+         comp1 = map(train, ~ lm(bwt ~ blength + gaweeks, data = .x)), # prediction with comparison model 1
+         comp2 = map(train, ~ lm(bwt ~ (bhead + blength + babysex)^3, data = .x))) %>% # prediction with comparison model 2
+  mutate(rmse_my_model    = map2_dbl(my_model, test, ~rmse(model = .x, data = .y)), # RMSE for my model
+         rmse_comp1 = map2_dbl(comp1, test, ~rmse(model = .x, data = .y)), # RMSE for comparison model 1
+         rmse_comp2 = map2_dbl(comp2, test, ~rmse(model = .x, data = .y))) # RMSE for comparison model 2
 
+# visualizing the distribution of RMSE for each model 
 bwt_cv %>% 
   select(starts_with("rmse")) %>% 
   gather(key = model, value = rmse) %>% 
   mutate(model = str_replace(model, "rmse_", ""),
          model = fct_inorder(model)) %>% 
   ggplot(aes(x = model, y = rmse)) + 
-  geom_violin()
+  geom_violin() + 
+  labs(x = 'Model',
+       y = 'RMSE',
+       title = 'Distribution of RMSE for each regression model')
 
 ```
 
+In comparing my model with the two given regressions according to their RMSE, my model appears to be superior, with RMSE values slightly lower than those of the second comparator model. This can be seen in the violin plot above. However, given how close in RMSE the second comparison model is to mine, it may be worth exploring including some of the compariso model's interaction terms in the model I propose. 

@@ -202,7 +202,10 @@ The figure above shows the odds ratios for case resolution of white vs. non-whit
 ### Problem 2
 
 ``` r
-birthweight = read_csv('./data/problem2/birthweight.csv')
+birthweight_tidy = read_csv('./data/problem2/birthweight.csv') %>%
+  mutate(babysex = fct_recode(as.character(babysex), 'Male' = '1', 'Female' = '2'),
+         mrace = fct_recode(as.character(mrace), 'White' = '1', 'Black' = '2', 'Asian' = '3', 'Puerto Rican' = '4'),
+         frace = fct_recode(as.character(frace), 'White' = '1', 'Black' = '2', 'Asian' = '3', 'Puerto Rican' = '4', 'Other' = '8'))
 ```
 
     ## Parsed with column specification:
@@ -216,28 +219,23 @@ birthweight = read_csv('./data/problem2/birthweight.csv')
     ## See spec(...) for full column specifications.
 
 ``` r
-birthweight_tidy = birthweight %>%
-  mutate(babysex = fct_recode(as.character(babysex), 'Male' = '1', 'Female' = '2'),
-         mrace = fct_recode(as.character(mrace), 'White' = '1', 'Black' = '2', 'Asian' = '3', 'Puerto Rican' = '4'),
-         frace = fct_recode(as.character(frace), 'White' = '1', 'Black' = '2', 'Asian' = '3', 'Puerto Rican' = '4', 'Other' = '8'))
-
-str(birthweight)
+str(birthweight_tidy)
 ```
 
     ## Classes 'tbl_df', 'tbl' and 'data.frame':    4342 obs. of  20 variables:
-    ##  $ babysex : int  2 1 2 1 2 1 2 2 1 1 ...
+    ##  $ babysex : Factor w/ 2 levels "Male","Female": 2 1 2 1 2 1 2 2 1 1 ...
     ##  $ bhead   : int  34 34 36 34 34 33 33 33 36 33 ...
     ##  $ blength : int  51 48 50 52 52 52 46 49 52 50 ...
     ##  $ bwt     : int  3629 3062 3345 3062 3374 3374 2523 2778 3515 3459 ...
     ##  $ delwt   : int  177 156 148 157 156 129 126 140 146 169 ...
     ##  $ fincome : int  35 65 85 55 5 55 96 5 85 75 ...
-    ##  $ frace   : int  1 2 1 1 1 1 2 1 1 2 ...
+    ##  $ frace   : Factor w/ 5 levels "White","Black",..: 1 2 1 1 1 1 2 1 1 2 ...
     ##  $ gaweeks : num  39.9 25.9 39.9 40 41.6 ...
     ##  $ malform : int  0 0 0 0 0 0 0 0 0 0 ...
     ##  $ menarche: int  13 14 12 14 13 12 14 12 11 12 ...
     ##  $ mheight : int  63 65 64 64 66 66 72 62 61 64 ...
     ##  $ momage  : int  36 25 29 18 20 23 29 19 13 19 ...
-    ##  $ mrace   : int  1 2 1 1 1 1 2 1 1 2 ...
+    ##  $ mrace   : Factor w/ 4 levels "White","Black",..: 1 2 1 1 1 1 2 1 1 2 ...
     ##  $ parity  : int  3 0 0 0 0 0 0 0 0 0 ...
     ##  $ pnumlbw : int  0 0 0 0 0 0 0 0 0 0 ...
     ##  $ pnumsga : int  0 0 0 0 0 0 0 0 0 0 ...
@@ -245,53 +243,8 @@ str(birthweight)
     ##  $ ppwt    : int  148 128 137 127 130 115 105 119 105 145 ...
     ##  $ smoken  : num  0 0 1 10 1 0 0 0 0 4 ...
     ##  $ wtgain  : int  29 28 11 30 26 14 21 21 41 24 ...
-    ##  - attr(*, "spec")=List of 2
-    ##   ..$ cols   :List of 20
-    ##   .. ..$ babysex : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ bhead   : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ blength : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ bwt     : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ delwt   : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ fincome : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ frace   : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ gaweeks : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_double" "collector"
-    ##   .. ..$ malform : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ menarche: list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ mheight : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ momage  : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ mrace   : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ parity  : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ pnumlbw : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ pnumsga : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ ppbmi   : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_double" "collector"
-    ##   .. ..$ ppwt    : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   .. ..$ smoken  : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_double" "collector"
-    ##   .. ..$ wtgain  : list()
-    ##   .. .. ..- attr(*, "class")= chr  "collector_integer" "collector"
-    ##   ..$ default: list()
-    ##   .. ..- attr(*, "class")= chr  "collector_guess" "collector"
-    ##   ..- attr(*, "class")= chr "col_spec"
 
-To construct a regression model, I first included all variables and then removed individually those that were not significant predictors of birthweight. I ended up with the following model:
+To construct a regression model, I first included all variables (no interactions) and then removed individually those that were not significant predictors of birthweight. The full process can be seen in a previous commit. I ended up with the following model:
 
 ``` r
 my_model = lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = birthweight_tidy) # linear regression model for birthweight
@@ -335,7 +288,9 @@ birthweight_tidy %>%
   modelr::add_residuals(my_model) %>% # residual of observed bwt - predicted bwt
   ggplot(aes(x = pred, y = resid)) + # plot 
   geom_point() + 
-  geom_hline(yintercept = 0, col = 'red') # add line for residual of 0 to better see distribution of residuals
+  geom_hline(yintercept = 0, col = 'red') + # add line for residual of 0 to better see distribution of residuals
+  labs(x = 'Predicted birthweight',
+       y = 'Residuals')
 ```
 
 ![](HW_6_files/figure-markdown_github/unnamed-chunk-5-1.png)
@@ -343,28 +298,85 @@ birthweight_tidy %>%
 ``` r
 # comparison models
 comp_model_1 = lm(bwt ~ blength + gaweeks, data = birthweight_tidy) # comparison model 1
-comp_model_2 = lm(bwt ~ (bhead + blength + babysex)^3, data = birthweight_tidy) # comparison model 2 with all interaction terms 
+summary(comp_model_1)
 ```
+
+    ## 
+    ## Call:
+    ## lm(formula = bwt ~ blength + gaweeks, data = birthweight_tidy)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -1709.6  -215.4   -11.4   208.2  4188.8 
+    ## 
+    ## Coefficients:
+    ##              Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept) -4347.667     97.958  -44.38   <2e-16 ***
+    ## blength       128.556      1.990   64.60   <2e-16 ***
+    ## gaweeks        27.047      1.718   15.74   <2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 333.2 on 4339 degrees of freedom
+    ## Multiple R-squared:  0.5769, Adjusted R-squared:  0.5767 
+    ## F-statistic:  2958 on 2 and 4339 DF,  p-value: < 2.2e-16
+
+``` r
+comp_model_2 = lm(bwt ~ (bhead + blength + babysex)^3, data = birthweight_tidy) # comparison model 2 with all interaction terms 
+summary(comp_model_2)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = bwt ~ (bhead + blength + babysex)^3, data = birthweight_tidy)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -1132.99  -190.42   -10.33   178.63  2617.96 
+    ## 
+    ## Coefficients:
+    ##                               Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)                 -7176.8170  1264.8397  -5.674 1.49e-08 ***
+    ## bhead                         181.7956    38.0542   4.777 1.84e-06 ***
+    ## blength                       102.1269    26.2118   3.896 9.92e-05 ***
+    ## babysexFemale                6374.8684  1677.7669   3.800 0.000147 ***
+    ## bhead:blength                  -0.5536     0.7802  -0.710 0.478012    
+    ## bhead:babysexFemale          -198.3932    51.0917  -3.883 0.000105 ***
+    ## blength:babysexFemale        -123.7729    35.1185  -3.524 0.000429 ***
+    ## bhead:blength:babysexFemale     3.8781     1.0566   3.670 0.000245 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 287.7 on 4334 degrees of freedom
+    ## Multiple R-squared:  0.6849, Adjusted R-squared:  0.6844 
+    ## F-statistic:  1346 on 7 and 4334 DF,  p-value: < 2.2e-16
 
 ``` r
 # test/train dataset for cross validation of models
 bwt_cv = birthweight_tidy %>%
-  crossv_mc(., 100) %>%
-  mutate(train = map(train, as_tibble),
+  crossv_mc(., n = 100) %>% # subset original dataset for cross validation
+  mutate(train = map(train, as_tibble), # create train and test subsets
          test = map(test, as_tibble)) %>%
-  mutate(my_model = map(train, ~lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = .x)),
-         comp1 = map(train, ~ lm(bwt ~ blength + gaweeks, data = .x)),
-         comp2 = map(train, ~ lm(bwt ~ (bhead + blength + babysex)^3, data = .x))) %>%
-  mutate(rmse_my_model    = map2_dbl(my_model, test, ~rmse(model = .x, data = .y)),
-         rmse_comp1 = map2_dbl(comp1, test, ~rmse(model = .x, data = .y)),
-         rmse_comp2 = map2_dbl(comp2, test, ~rmse(model = .x, data = .y)))
+  mutate(my_model = map(train, ~lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = .x)), # prediction using my model across each training subset
+         comp1 = map(train, ~ lm(bwt ~ blength + gaweeks, data = .x)), # prediction with comparison model 1
+         comp2 = map(train, ~ lm(bwt ~ (bhead + blength + babysex)^3, data = .x))) %>% # prediction with comparison model 2
+  mutate(rmse_my_model    = map2_dbl(my_model, test, ~rmse(model = .x, data = .y)), # RMSE for my model
+         rmse_comp1 = map2_dbl(comp1, test, ~rmse(model = .x, data = .y)), # RMSE for comparison model 1
+         rmse_comp2 = map2_dbl(comp2, test, ~rmse(model = .x, data = .y))) # RMSE for comparison model 2
 
+# visualizing the distribution of RMSE for each model 
 bwt_cv %>% 
   select(starts_with("rmse")) %>% 
   gather(key = model, value = rmse) %>% 
   mutate(model = str_replace(model, "rmse_", ""),
          model = fct_inorder(model)) %>% 
-  ggplot(aes(x = model, y = rmse)) + geom_violin()
+  ggplot(aes(x = model, y = rmse)) + 
+  geom_violin() + 
+  labs(x = 'Model',
+       y = 'RMSE',
+       title = 'Distribution of RMSE for each regression model')
 ```
 
 ![](HW_6_files/figure-markdown_github/unnamed-chunk-6-1.png)
+
+In comparing my model with the two given regressions according to their RMSE, my model appears to be superior, with RMSE values slightly lower than those of the second comparator model. This can be seen in the violin plot above. However, given how close in RMSE the second comparison model is to mine, it may be worth exploring including some of the compariso model's interaction terms in the model I propose.
