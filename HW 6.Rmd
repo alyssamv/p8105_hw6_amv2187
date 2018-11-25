@@ -82,7 +82,7 @@ log_reg_cities %>%
   
 ```
 
-The figure above shows the odds ratios for case resolution of white vs. non-white victims (all else constant). All cities on display expect for two - Tampa, FL and Birmingham, AL - exhibit a lower odds of resolving murder of non-white victims, compared to white victims. The odds of resolution between races is about equal in Durham, NC, but the confidence interval around the estimate is wide. 
+The figure above shows the odds ratios for case resolution of white vs. non-white victims (all else constant). All cities on display except for two - Tampa, FL and Birmingham, AL - exhibit a lower odds of resolving murders of non-white victims, compared to white victims. However, estimates of several more cities do not exhibit a statistically significant difference in murder resolution between races (95% CI includes OR of 1); take, for example, Richmond, VA, where the OR is 0.447, but the CI extends from 0.162 to 1.238, suggesting that we cannot exclude the possibility that the true odds of resolution is equal (OR=1). Conversely, the odds of resolution across races is about equal in Durham, NC, but the confidence interval around the estimate is wide. 
 
 ### Problem 2
 
@@ -95,6 +95,20 @@ birthweight_tidy = birthweight %>%
          frace = fct_recode(as.character(frace), 'White' = '1', 'Black' = '2', 'Asian' = '3', 'Puerto Rican' = '4', 'Other' = '8'))
 
 str(birthweight)
+```
+
+
+```{r}
+summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + malform + menarche + mheight + momage + mrace + parity + pnumlbw + pnumsga + ppbmi + ppwt + smoken + wtgain, data = birthweight_tidy))
+summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + malform + menarche + mheight + momage + mrace + parity + ppbmi + ppwt + smoken, data = birthweight_tidy)) # remove pnumlbw, pnumsga, wtgain for NA
+summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + menarche + mheight + momage + mrace + parity + ppbmi + ppwt + smoken, data = birthweight_tidy)) # remove malform
+summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + menarche + mheight + momage + mrace + parity + ppwt + smoken, data = birthweight_tidy)) # remove frace
+summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + mheight + momage + mrace + parity + ppwt + smoken, data = birthweight_tidy)) # remove menarche
+summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + mheight + momage + mrace + ppwt + smoken, data = birthweight_tidy)) # remove parity
+summary(lm(bwt ~ babysex + bhead + blength + delwt + mheight + momage + mrace + ppwt + smoken, data = birthweight_tidy)) # remove fincome
+summary(lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = birthweight_tidy)) # remove momage
+
+
 
 
 lm(bwt ~ blength + gaweeks, data = birthweight_tidy) # comparison model 1
