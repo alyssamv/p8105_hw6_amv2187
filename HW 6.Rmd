@@ -85,6 +85,10 @@ log_reg_cities %>%
 
 The figure above shows the odds ratios for case resolution of white vs. non-white victims (all else constant). All cities on display except for two - Tampa, FL and Birmingham, AL - exhibit a lower odds of resolving murders of non-white victims, compared to white victims. However, estimates of several more cities do not exhibit a statistically significant difference in murder resolution between races (95% CI includes OR of 1); take, for example, Richmond, VA, where the OR is 0.447, but the CI extends from 0.162 to 1.238, suggesting that we cannot exclude the possibility that the true odds of resolution is equal (OR=1). Conversely, the odds of resolution across races is about equal in Durham, NC, but the confidence interval around the estimate is wide. 
 
+
+
+
+
 ### Problem 2
 
 ```{r}
@@ -104,7 +108,6 @@ summary(my_model) # summary of my regression model
 
 # Plot of fitted values against residuals
 birthweight_tidy %>%
-  select(babysex, bhead, blength, delwt, mheight, mrace, ppwt, smoken, bwt) %>%
   modelr::add_predictions(my_model) %>% # add predicted birthweight
   modelr::add_residuals(my_model) %>% # residual of observed bwt - predicted bwt
   ggplot(aes(x = pred, y = resid)) + # plot 
@@ -121,6 +124,8 @@ summary(comp_model_1)
 comp_model_2 = lm(bwt ~ (bhead + blength + babysex)^3, data = birthweight_tidy) # comparison model 2 with all interaction terms 
 summary(comp_model_2)
 ```
+
+To cross-validate my model and compare it to the other two, I first construct a set of training and testing subset of the original data. I then construct each of the three models based on the training datasets, and use them to predict the outcomes (birthweight) in the testing datasets. How well each model performs is based on the root mean squared error (RMSE) of the predictions.
 
 ```{r}
 # test/train dataset for cross validation of models

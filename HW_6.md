@@ -283,7 +283,6 @@ summary(my_model) # summary of my regression model
 ``` r
 # Plot of fitted values against residuals
 birthweight_tidy %>%
-  select(babysex, bhead, blength, delwt, mheight, mrace, ppwt, smoken, bwt) %>%
   modelr::add_predictions(my_model) %>% # add predicted birthweight
   modelr::add_residuals(my_model) %>% # residual of observed bwt - predicted bwt
   ggplot(aes(x = pred, y = resid)) + # plot 
@@ -350,6 +349,8 @@ summary(comp_model_2)
     ## Residual standard error: 287.7 on 4334 degrees of freedom
     ## Multiple R-squared:  0.6849, Adjusted R-squared:  0.6844 
     ## F-statistic:  1346 on 7 and 4334 DF,  p-value: < 2.2e-16
+
+To cross-validate my model and compare it to the other two, I first construct a set of training and testing subset of the original data. I then construct each of the three models based on the training datasets, and use them to predict the outcomes (birthweight) in the testing datasets. How well each model performs is based on the root mean squared error (RMSE) of the predictions.
 
 ``` r
 # test/train dataset for cross validation of models
