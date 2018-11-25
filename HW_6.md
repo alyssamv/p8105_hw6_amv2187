@@ -291,285 +291,11 @@ str(birthweight)
     ##   .. ..- attr(*, "class")= chr  "collector_guess" "collector"
     ##   ..- attr(*, "class")= chr "col_spec"
 
-``` r
-summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + malform + menarche + mheight + momage + mrace + parity + pnumlbw + pnumsga + ppbmi + ppwt + smoken + wtgain, data = birthweight_tidy))
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = bwt ~ babysex + bhead + blength + delwt + fincome + 
-    ##     frace + malform + menarche + mheight + momage + mrace + parity + 
-    ##     pnumlbw + pnumsga + ppbmi + ppwt + smoken + wtgain, data = birthweight_tidy)
-    ## 
-    ## Residuals:
-    ##      Min       1Q   Median       3Q      Max 
-    ## -1099.53  -181.57    -3.71   174.63  2405.55 
-    ## 
-    ## Coefficients: (3 not defined because of singularities)
-    ##                     Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)       -6076.3566   664.6165  -9.143  < 2e-16 ***
-    ## babysexFemale        35.3765     8.4822   4.171 3.10e-05 ***
-    ## bhead               136.3203     3.4038  40.050  < 2e-16 ***
-    ## blength              77.4232     2.0113  38.494  < 2e-16 ***
-    ## delwt                 4.3518     0.3963  10.981  < 2e-16 ***
-    ## fincome               0.3172     0.1808   1.755 0.079375 .  
-    ## fraceBlack           13.3009    46.4752   0.286 0.774744    
-    ## fraceAsian           19.7233    69.7841   0.283 0.777471    
-    ## fracePuerto Rican   -50.7499    44.9905  -1.128 0.259377    
-    ## fraceOther            6.7109    74.5955   0.090 0.928320    
-    ## malform               3.9295    71.1197   0.055 0.955940    
-    ## menarche             -3.5514     2.9155  -1.218 0.223246    
-    ## mheight               8.8152    10.3835   0.849 0.395950    
-    ## momage                1.2954     1.2288   1.054 0.291859    
-    ## mraceBlack         -155.2296    46.3673  -3.348 0.000821 ***
-    ## mraceAsian          -90.8324    72.4258  -1.254 0.209857    
-    ## mracePuerto Rican   -59.8567    45.4529  -1.317 0.187944    
-    ## parity               69.4043    40.6275   1.708 0.087651 .  
-    ## pnumlbw                   NA         NA      NA       NA    
-    ## pnumsga                   NA         NA      NA       NA    
-    ## ppbmi                 3.4160    14.9958   0.228 0.819814    
-    ## ppwt                 -3.5621     2.6305  -1.354 0.175761    
-    ## smoken               -4.6563     0.5907  -7.883 4.01e-15 ***
-    ## wtgain                    NA         NA      NA       NA    
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 274.4 on 4321 degrees of freedom
-    ## Multiple R-squared:  0.7143, Adjusted R-squared:  0.713 
-    ## F-statistic: 540.1 on 20 and 4321 DF,  p-value: < 2.2e-16
+To construct a regression model, I first included all variables and then removed individually those that were not significant predictors of birthweight. I ended up with the following model:
 
 ``` r
-summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + malform + menarche + mheight + momage + mrace + parity + ppbmi + ppwt + smoken, data = birthweight_tidy)) # remove pnumlbw, pnumsga, wtgain for NA
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = bwt ~ babysex + bhead + blength + delwt + fincome + 
-    ##     frace + malform + menarche + mheight + momage + mrace + parity + 
-    ##     ppbmi + ppwt + smoken, data = birthweight_tidy)
-    ## 
-    ## Residuals:
-    ##      Min       1Q   Median       3Q      Max 
-    ## -1099.53  -181.57    -3.71   174.63  2405.55 
-    ## 
-    ## Coefficients:
-    ##                     Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)       -6076.3566   664.6165  -9.143  < 2e-16 ***
-    ## babysexFemale        35.3765     8.4822   4.171 3.10e-05 ***
-    ## bhead               136.3203     3.4038  40.050  < 2e-16 ***
-    ## blength              77.4232     2.0113  38.494  < 2e-16 ***
-    ## delwt                 4.3518     0.3963  10.981  < 2e-16 ***
-    ## fincome               0.3172     0.1808   1.755 0.079375 .  
-    ## fraceBlack           13.3009    46.4752   0.286 0.774744    
-    ## fraceAsian           19.7233    69.7841   0.283 0.777471    
-    ## fracePuerto Rican   -50.7499    44.9905  -1.128 0.259377    
-    ## fraceOther            6.7109    74.5955   0.090 0.928320    
-    ## malform               3.9295    71.1197   0.055 0.955940    
-    ## menarche             -3.5514     2.9155  -1.218 0.223246    
-    ## mheight               8.8152    10.3835   0.849 0.395950    
-    ## momage                1.2954     1.2288   1.054 0.291859    
-    ## mraceBlack         -155.2296    46.3673  -3.348 0.000821 ***
-    ## mraceAsian          -90.8324    72.4258  -1.254 0.209857    
-    ## mracePuerto Rican   -59.8567    45.4529  -1.317 0.187944    
-    ## parity               69.4043    40.6275   1.708 0.087651 .  
-    ## ppbmi                 3.4160    14.9958   0.228 0.819814    
-    ## ppwt                 -3.5621     2.6305  -1.354 0.175761    
-    ## smoken               -4.6563     0.5907  -7.883 4.01e-15 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 274.4 on 4321 degrees of freedom
-    ## Multiple R-squared:  0.7143, Adjusted R-squared:  0.713 
-    ## F-statistic: 540.1 on 20 and 4321 DF,  p-value: < 2.2e-16
-
-``` r
-summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + menarche + mheight + momage + mrace + parity + ppbmi + ppwt + smoken, data = birthweight_tidy)) # remove malform
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = bwt ~ babysex + bhead + blength + delwt + fincome + 
-    ##     frace + menarche + mheight + momage + mrace + parity + ppbmi + 
-    ##     ppwt + smoken, data = birthweight_tidy)
-    ## 
-    ## Residuals:
-    ##      Min       1Q   Median       3Q      Max 
-    ## -1099.52  -181.59    -3.72   174.63  2405.46 
-    ## 
-    ## Coefficients:
-    ##                     Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)       -6075.9476   664.4986  -9.144  < 2e-16 ***
-    ## babysexFemale        35.3690     8.4801   4.171 3.09e-05 ***
-    ## bhead               136.3214     3.4033  40.055  < 2e-16 ***
-    ## blength              77.4212     2.0108  38.503  < 2e-16 ***
-    ## delwt                 4.3525     0.3960  10.990  < 2e-16 ***
-    ## fincome               0.3170     0.1807   1.754  0.07948 .  
-    ## fraceBlack           13.2886    46.4693   0.286  0.77492    
-    ## fraceAsian           19.7061    69.7753   0.282  0.77763    
-    ## fracePuerto Rican   -50.7615    44.9848  -1.128  0.25921    
-    ## fraceOther            6.6856    74.5855   0.090  0.92858    
-    ## menarche             -3.5532     2.9150  -1.219  0.22292    
-    ## mheight               8.8099    10.3819   0.849  0.39616    
-    ## momage                1.2968     1.2285   1.056  0.29119    
-    ## mraceBlack         -155.2291    46.3620  -3.348  0.00082 ***
-    ## mraceAsian          -90.8415    72.4172  -1.254  0.20976    
-    ## mracePuerto Rican   -59.8683    45.4472  -1.317  0.18780    
-    ## parity               69.3964    40.6226   1.708  0.08765 .  
-    ## ppbmi                 3.4099    14.9937   0.227  0.82010    
-    ## ppwt                 -3.5617     2.6302  -1.354  0.17575    
-    ## smoken               -4.6555     0.5904  -7.885 3.95e-15 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 274.4 on 4322 degrees of freedom
-    ## Multiple R-squared:  0.7143, Adjusted R-squared:  0.713 
-    ## F-statistic: 568.7 on 19 and 4322 DF,  p-value: < 2.2e-16
-
-``` r
-summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + menarche + mheight + momage + mrace + parity + ppwt + smoken, data = birthweight_tidy)) # remove frace
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = bwt ~ babysex + bhead + blength + delwt + fincome + 
-    ##     menarche + mheight + momage + mrace + parity + ppwt + smoken, 
-    ##     data = birthweight_tidy)
-    ## 
-    ## Residuals:
-    ##      Min       1Q   Median       3Q      Max 
-    ## -1097.67  -181.50    -3.58   175.77  2404.34 
-    ## 
-    ## Coefficients:
-    ##                     Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)       -5929.4024   139.9578 -42.366  < 2e-16 ***
-    ## babysexFemale        35.3339     8.4761   4.169 3.12e-05 ***
-    ## bhead               136.3788     3.3988  40.125  < 2e-16 ***
-    ## blength              77.3824     2.0095  38.509  < 2e-16 ***
-    ## delwt                 4.3503     0.3957  10.994  < 2e-16 ***
-    ## fincome               0.3183     0.1803   1.765 0.077583 .  
-    ## menarche             -3.6408     2.9108  -1.251 0.211081    
-    ## mheight               6.5303     1.8112   3.606 0.000315 ***
-    ## momage                1.2977     1.2267   1.058 0.290178    
-    ## mraceBlack         -141.9771    10.2642 -13.832  < 2e-16 ***
-    ## mraceAsian          -75.1569    43.0182  -1.747 0.080692 .  
-    ## mracePuerto Rican  -106.1816    19.4828  -5.450 5.32e-08 ***
-    ## parity               69.3553    40.6034   1.708 0.087687 .  
-    ## ppwt                 -2.9724     0.4344  -6.842 8.88e-12 ***
-    ## smoken               -4.6275     0.5893  -7.853 5.10e-15 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 274.3 on 4327 degrees of freedom
-    ## Multiple R-squared:  0.7142, Adjusted R-squared:  0.7132 
-    ## F-statistic: 772.2 on 14 and 4327 DF,  p-value: < 2.2e-16
-
-``` r
-summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + mheight + momage + mrace + parity + ppwt + smoken, data = birthweight_tidy)) # remove menarche
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = bwt ~ babysex + bhead + blength + delwt + fincome + 
-    ##     mheight + momage + mrace + parity + ppwt + smoken, data = birthweight_tidy)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -1099.0  -182.5    -4.3   176.7  2415.1 
-    ## 
-    ## Coefficients:
-    ##                     Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)       -5957.0787   138.2066 -43.103  < 2e-16 ***
-    ## babysexFemale        35.3594     8.4766   4.171 3.09e-05 ***
-    ## bhead               136.3075     3.3986  40.107  < 2e-16 ***
-    ## blength              77.4334     2.0092  38.539  < 2e-16 ***
-    ## delwt                 4.3715     0.3954  11.057  < 2e-16 ***
-    ## fincome               0.3308     0.1800   1.838 0.066173 .  
-    ## mheight               6.2509     1.7975   3.478 0.000511 ***
-    ## momage                1.0078     1.2047   0.837 0.402882    
-    ## mraceBlack         -142.6081    10.2524 -13.910  < 2e-16 ***
-    ## mraceAsian          -77.6130    42.9762  -1.806 0.070995 .  
-    ## mracePuerto Rican  -107.0132    19.4727  -5.496 4.12e-08 ***
-    ## parity               68.9864    40.6050   1.699 0.089398 .  
-    ## ppwt                 -2.9532     0.4342  -6.802 1.17e-11 ***
-    ## smoken               -4.6422     0.5892  -7.879 4.16e-15 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 274.3 on 4328 degrees of freedom
-    ## Multiple R-squared:  0.7141, Adjusted R-squared:  0.7132 
-    ## F-statistic: 831.4 on 13 and 4328 DF,  p-value: < 2.2e-16
-
-``` r
-summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + mheight + momage + mrace + ppwt + smoken, data = birthweight_tidy)) # remove parity
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = bwt ~ babysex + bhead + blength + delwt + fincome + 
-    ##     mheight + momage + mrace + ppwt + smoken, data = birthweight_tidy)
-    ## 
-    ## Residuals:
-    ##      Min       1Q   Median       3Q      Max 
-    ## -1097.84  -182.51    -4.61   176.68  2412.25 
-    ## 
-    ## Coefficients:
-    ##                     Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)       -5953.7416   138.2227 -43.074  < 2e-16 ***
-    ## babysexFemale        35.6743     8.4764   4.209 2.62e-05 ***
-    ## bhead               136.3183     3.3993  40.102  < 2e-16 ***
-    ## blength              77.3439     2.0089  38.500  < 2e-16 ***
-    ## delwt                 4.3869     0.3954  11.096  < 2e-16 ***
-    ## fincome               0.3193     0.1799   1.775 0.075999 .  
-    ## mheight               6.2259     1.7978   3.463 0.000539 ***
-    ## momage                1.1538     1.2019   0.960 0.337113    
-    ## mraceBlack         -142.4236    10.2541 -13.889  < 2e-16 ***
-    ## mraceAsian          -78.5154    42.9823  -1.827 0.067815 .  
-    ## mracePuerto Rican  -107.2586    19.4765  -5.507 3.86e-08 ***
-    ## ppwt                 -2.9726     0.4341  -6.848 8.56e-12 ***
-    ## smoken               -4.6493     0.5893  -7.889 3.82e-15 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 274.3 on 4329 degrees of freedom
-    ## Multiple R-squared:  0.7139, Adjusted R-squared:  0.7131 
-    ## F-statistic:   900 on 12 and 4329 DF,  p-value: < 2.2e-16
-
-``` r
-summary(lm(bwt ~ babysex + bhead + blength + delwt + mheight + momage + mrace + ppwt + smoken, data = birthweight_tidy)) # remove fincome
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = bwt ~ babysex + bhead + blength + delwt + mheight + 
-    ##     momage + mrace + ppwt + smoken, data = birthweight_tidy)
-    ## 
-    ## Residuals:
-    ##      Min       1Q   Median       3Q      Max 
-    ## -1106.25  -181.67    -5.13   177.10  2398.58 
-    ## 
-    ## Coefficients:
-    ##                     Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)       -5962.2284   138.1743 -43.150  < 2e-16 ***
-    ## babysexFemale        35.6144     8.4785   4.201 2.72e-05 ***
-    ## bhead               136.5623     3.3974  40.196  < 2e-16 ***
-    ## blength              77.2240     2.0083  38.452  < 2e-16 ***
-    ## delwt                 4.3797     0.3954  11.076  < 2e-16 ***
-    ## mheight               6.4658     1.7931   3.606 0.000315 ***
-    ## momage                1.6028     1.1752   1.364 0.172680    
-    ## mraceBlack         -147.8666     9.7872 -15.108  < 2e-16 ***
-    ## mraceAsian          -83.5317    42.8999  -1.947 0.051584 .  
-    ## mracePuerto Rican  -111.9845    19.2984  -5.803 6.99e-09 ***
-    ## ppwt                 -2.9736     0.4342  -6.848 8.53e-12 ***
-    ## smoken               -4.6765     0.5893  -7.936 2.64e-15 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 274.4 on 4330 degrees of freedom
-    ## Multiple R-squared:  0.7137, Adjusted R-squared:  0.7129 
-    ## F-statistic:   981 on 11 and 4330 DF,  p-value: < 2.2e-16
-
-``` r
-summary(lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = birthweight_tidy)) # remove momage
+my_model = lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = birthweight_tidy) # linear regression model for birthweight
+summary(my_model) # summary of my regression model
 ```
 
     ## 
@@ -602,31 +328,43 @@ summary(lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + sm
     ## F-statistic:  1079 on 10 and 4331 DF,  p-value: < 2.2e-16
 
 ``` r
-lm(bwt ~ blength + gaweeks, data = birthweight_tidy) # comparison model 1
+# Plot of fitted values against residuals
+birthweight_tidy %>%
+  select(babysex, bhead, blength, delwt, mheight, mrace, ppwt, smoken, bwt) %>%
+  modelr::add_predictions(my_model) %>% # add predicted birthweight
+  modelr::add_residuals(my_model) %>% # residual of observed bwt - predicted bwt
+  ggplot(aes(x = pred, y = resid)) + # plot 
+  geom_point() + 
+  geom_hline(yintercept = 0, col = 'red') # add line for residual of 0 to better see distribution of residuals
 ```
 
-    ## 
-    ## Call:
-    ## lm(formula = bwt ~ blength + gaweeks, data = birthweight_tidy)
-    ## 
-    ## Coefficients:
-    ## (Intercept)      blength      gaweeks  
-    ##    -4347.67       128.56        27.05
+![](HW_6_files/figure-markdown_github/unnamed-chunk-5-1.png)
 
 ``` r
-lm(bwt ~ (bhead + blength + babysex)^3, data = birthweight_tidy) # comparison model 2 with all interaction terms 
+# comparison models
+comp_model_1 = lm(bwt ~ blength + gaweeks, data = birthweight_tidy) # comparison model 1
+comp_model_2 = lm(bwt ~ (bhead + blength + babysex)^3, data = birthweight_tidy) # comparison model 2 with all interaction terms 
 ```
 
-    ## 
-    ## Call:
-    ## lm(formula = bwt ~ (bhead + blength + babysex)^3, data = birthweight_tidy)
-    ## 
-    ## Coefficients:
-    ##                 (Intercept)                        bhead  
-    ##                  -7176.8170                     181.7956  
-    ##                     blength                babysexFemale  
-    ##                    102.1269                    6374.8684  
-    ##               bhead:blength          bhead:babysexFemale  
-    ##                     -0.5536                    -198.3932  
-    ##       blength:babysexFemale  bhead:blength:babysexFemale  
-    ##                   -123.7729                       3.8781
+``` r
+# test/train dataset for cross validation of models
+bwt_cv = birthweight_tidy %>%
+  crossv_mc(., 100) %>%
+  mutate(train = map(train, as_tibble),
+         test = map(test, as_tibble)) %>%
+  mutate(my_model = map(train, ~lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = .x)),
+         comp1 = map(train, ~ lm(bwt ~ blength + gaweeks, data = .x)),
+         comp2 = map(train, ~ lm(bwt ~ (bhead + blength + babysex)^3, data = .x))) %>%
+  mutate(rmse_my_model    = map2_dbl(my_model, test, ~rmse(model = .x, data = .y)),
+         rmse_comp1 = map2_dbl(comp1, test, ~rmse(model = .x, data = .y)),
+         rmse_comp2 = map2_dbl(comp2, test, ~rmse(model = .x, data = .y)))
+
+bwt_cv %>% 
+  select(starts_with("rmse")) %>% 
+  gather(key = model, value = rmse) %>% 
+  mutate(model = str_replace(model, "rmse_", ""),
+         model = fct_inorder(model)) %>% 
+  ggplot(aes(x = model, y = rmse)) + geom_violin()
+```
+
+![](HW_6_files/figure-markdown_github/unnamed-chunk-6-1.png)

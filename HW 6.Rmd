@@ -9,6 +9,7 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(modelr)
 
 theme_set(theme_bw())
 ```
@@ -97,22 +98,47 @@ birthweight_tidy = birthweight %>%
 str(birthweight)
 ```
 
+To construct a regression model, I first included all variables and then removed individually those that were not significant predictors of birthweight. I ended up with the following model:
 
 ```{r}
-summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + malform + menarche + mheight + momage + mrace + parity + pnumlbw + pnumsga + ppbmi + ppwt + smoken + wtgain, data = birthweight_tidy))
-summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + malform + menarche + mheight + momage + mrace + parity + ppbmi + ppwt + smoken, data = birthweight_tidy)) # remove pnumlbw, pnumsga, wtgain for NA
-summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + frace + menarche + mheight + momage + mrace + parity + ppbmi + ppwt + smoken, data = birthweight_tidy)) # remove malform
-summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + menarche + mheight + momage + mrace + parity + ppwt + smoken, data = birthweight_tidy)) # remove frace
-summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + mheight + momage + mrace + parity + ppwt + smoken, data = birthweight_tidy)) # remove menarche
-summary(lm(bwt ~ babysex + bhead + blength + delwt + fincome + mheight + momage + mrace + ppwt + smoken, data = birthweight_tidy)) # remove parity
-summary(lm(bwt ~ babysex + bhead + blength + delwt + mheight + momage + mrace + ppwt + smoken, data = birthweight_tidy)) # remove fincome
-summary(lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = birthweight_tidy)) # remove momage
+my_model = lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = birthweight_tidy) # linear regression model for birthweight
+summary(my_model) # summary of my regression model
+
+# Plot of fitted values against residuals
+birthweight_tidy %>%
+  select(babysex, bhead, blength, delwt, mheight, mrace, ppwt, smoken, bwt) %>%
+  modelr::add_predictions(my_model) %>% # add predicted birthweight
+  modelr::add_residuals(my_model) %>% # residual of observed bwt - predicted bwt
+  ggplot(aes(x = pred, y = resid)) + # plot 
+  geom_point() + 
+  geom_hline(yintercept = 0, col = 'red') # add line for residual of 0 to better see distribution of residuals
 
 
+# comparison models
+comp_model_1 = lm(bwt ~ blength + gaweeks, data = birthweight_tidy) # comparison model 1
+comp_model_2 = lm(bwt ~ (bhead + blength + babysex)^3, data = birthweight_tidy) # comparison model 2 with all interaction terms 
+```
 
+```{r}
+# test/train dataset for cross validation of models
+bwt_cv = birthweight_tidy %>%
+  crossv_mc(., 100) %>%
+  mutate(train = map(train, as_tibble),
+         test = map(test, as_tibble)) %>%
+  mutate(my_model = map(train, ~lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = .x)),
+         comp1 = map(train, ~ lm(bwt ~ blength + gaweeks, data = .x)),
+         comp2 = map(train, ~ lm(bwt ~ (bhead + blength + babysex)^3, data = .x))) %>%
+  mutate(rmse_my_model    = map2_dbl(my_model, test, ~rmse(model = .x, data = .y)),
+         rmse_comp1 = map2_dbl(comp1, test, ~rmse(model = .x, data = .y)),
+         rmse_comp2 = map2_dbl(comp2, test, ~rmse(model = .x, data = .y)))
 
-lm(bwt ~ blength + gaweeks, data = birthweight_tidy) # comparison model 1
-lm(bwt ~ (bhead + blength + babysex)^3, data = birthweight_tidy) # comparison model 2 with all interaction terms 
+bwt_cv %>% 
+  select(starts_with("rmse")) %>% 
+  gather(key = model, value = rmse) %>% 
+  mutate(model = str_replace(model, "rmse_", ""),
+         model = fct_inorder(model)) %>% 
+  ggplot(aes(x = model, y = rmse)) + 
+  geom_violin()
 
 ```
 
