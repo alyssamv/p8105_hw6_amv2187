@@ -100,7 +100,7 @@ birthweight_tidy = read_csv('./data/problem2/birthweight.csv') %>%
 str(birthweight_tidy)
 ```
 
-To construct a regression model, I first included all variables (no interactions) and then removed individually those that were not significant predictors of birthweight. The full process can be seen in a previous commit. I ended up with the following model:
+To construct a regression model, I first included all variables (no interactions) and then removed individually those that were not significant predictors of birthweight.  The full process can be seen in a previous commit. I ended up with the following model. 
 
 ```{r}
 my_model = lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = birthweight_tidy) # linear regression model for birthweight
@@ -115,8 +115,16 @@ birthweight_tidy %>%
   geom_hline(yintercept = 0, col = 'red') + # add line for residual of 0 to better see distribution of residuals
   labs(x = 'Predicted birthweight',
        y = 'Residuals')
+```
+
+In examining the relationship between the variables I selected, there is some evidence of nonlinear associations between the baby's size (head circumference and body length) and its weight. However, I decided to omit interaction terms from my model for the sake of simplicity and the scope of this assignment. 
+
+```{r}
+birthweight_tidy %>% select(bwt, bhead, blength, delwt, mheight, ppwt, smoken) %>% pairs
+```
 
 
+```{r}
 # comparison models
 comp_model_1 = lm(bwt ~ blength + gaweeks, data = birthweight_tidy) # comparison model 1
 summary(comp_model_1)

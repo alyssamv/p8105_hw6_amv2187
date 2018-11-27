@@ -244,7 +244,7 @@ str(birthweight_tidy)
     ##  $ smoken  : num  0 0 1 10 1 0 0 0 0 4 ...
     ##  $ wtgain  : int  29 28 11 30 26 14 21 21 41 24 ...
 
-To construct a regression model, I first included all variables (no interactions) and then removed individually those that were not significant predictors of birthweight. The full process can be seen in a previous commit. I ended up with the following model:
+To construct a regression model, I first included all variables (no interactions) and then removed individually those that were not significant predictors of birthweight. The full process can be seen in a previous commit. I ended up with the following model.
 
 ``` r
 my_model = lm(bwt ~ babysex + bhead + blength + delwt + mheight + mrace + ppwt + smoken, data = birthweight_tidy) # linear regression model for birthweight
@@ -293,6 +293,14 @@ birthweight_tidy %>%
 ```
 
 ![](HW_6_files/figure-markdown_github/unnamed-chunk-5-1.png)
+
+In examining the relationship between the variables I selected, there is some evidence of nonlinear associations between the baby's size (head circumference and body length) and its weight. However, I decided to omit interaction terms from my model for the sake of simplicity and the scope of this assignment.
+
+``` r
+birthweight_tidy %>% select(bwt, bhead, blength, delwt, mheight, ppwt, smoken) %>% pairs
+```
+
+![](HW_6_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
 ``` r
 # comparison models
@@ -378,6 +386,6 @@ bwt_cv %>%
        title = 'Distribution of RMSE for each regression model')
 ```
 
-![](HW_6_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](HW_6_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
 In comparing my model with the two given regressions according to their RMSE, my model appears to be superior, with RMSE values slightly lower than those of the second comparator model. This can be seen in the violin plot above. However, given how close in RMSE the second comparison model is to mine, it may be worth exploring including some of the compariso model's interaction terms in the model I propose.
